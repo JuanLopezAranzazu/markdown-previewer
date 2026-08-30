@@ -1,19 +1,48 @@
-import { Button } from "@/components/ui/button"
+import { useRef, useState } from "react"
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable"
+import { MarkdownEditor } from "@/components/markdown-editor"
+import { MarkdownPreview } from "@/components/markdown-preview"
+import { EditorToolbar } from "@/components/editor-toolbar"
+import { useMarkdownStorage } from "@/hooks/use-markdown-storage"
+import { exportAsHtml, exportAsMarkdown } from "@/lib/export-markdown"
 
-export function App() {
+function App() {
+  const { content, setContent, savedAt, reset } = useMarkdownStorage()
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const previewRef = useRef<HTMLDivElement>(null)
+
+  const handleExportHtml = () => {
+    exportAsHtml(previewRef.current?.innerHTML ?? "")
+  }
+
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
+    <div className="flex h-screen flex-col bg-background text-foreground">
+      <EditorToolbar
+        savedAt={savedAt}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={() => setIsFullscreen((v) => !v)}
+        onExportMd={() => exportAsMarkdown(content)}
+        onExportHtml={handleExportHtml}
+        onReset={reset}
+      />
+
+      <ResizablePanelGroup orientation="horizontal" className="flex-1">
+        {!isFullscreen && (
+          <>
+            <ResizablePanel defaultSize={50} minSize={20}>
+              <MarkdownEditor value={content} onChange={setContent} />
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+          </>
+        )}
+        <ResizablePanel defaultSize={isFullscreen ? 100 : 50} minSize={20}>
+          <MarkdownPreview ref={previewRef} content={content} />
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   )
 }
