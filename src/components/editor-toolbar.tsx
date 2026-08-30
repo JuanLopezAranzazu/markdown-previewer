@@ -33,18 +33,21 @@ export function EditorToolbar({
   onReset,
 }: EditorToolbarProps) {
   return (
-    <header className="flex h-12 items-center justify-between border-b px-4">
-      <div className="flex items-center gap-2">
-        <FileCode className="h-4 w-4 text-muted-foreground" />
-        <span className="text-sm font-medium">Editor de Markdown</span>
+    <header className="flex h-12 items-center justify-between border-b px-2 sm:px-4">
+      <div className="flex items-center gap-2 overflow-hidden">
+        <FileCode className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <span className="truncate text-sm font-medium">
+          <span className="hidden sm:inline">Editor de Markdown</span>
+          <span className="sm:hidden">Markdown</span>
+        </span>
         {savedAt && (
-          <span className="ml-2 text-xs text-muted-foreground">
+          <span className="ml-2 hidden shrink-0 text-xs text-muted-foreground md:inline">
             Guardado {savedAt.toLocaleTimeString()}
           </span>
         )}
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5 sm:gap-1">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger
@@ -88,6 +91,7 @@ export function EditorToolbar({
                   variant="ghost"
                   size="icon"
                   onClick={onToggleFullscreen}
+                  className="hidden sm:inline-flex"
                 >
                   {isFullscreen ? (
                     <Minimize2 className="h-4 w-4" />
